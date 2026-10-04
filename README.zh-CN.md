@@ -1,5 +1,9 @@
 # Vision Scholar · 视觉研究工作台
 
+[![离线工程检查](https://github.com/cht21-c/vision-scholar/actions/workflows/ci.yml/badge.svg)](https://github.com/cht21-c/vision-scholar/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/cht21-c/vision-scholar)](https://github.com/cht21-c/vision-scholar/releases/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-173d75.svg)](LICENSE)
+
 一个能串起**论文检索、源码定位、研究方案、真实 CPU 实验与证据回查**的 Agent 项目。React / TypeScript 前端，FastAPI 后端，LangGraph 做角色分流，V3 独立实现内层模型与工具执行循环。
 
 [原创贡献](CONTRIBUTIONS.md) · [完整实验报告](docs/research-evaluation.md) · [中文 Excel](evidence/v3/原创机制与实验证据.xlsx) · [完整 Prompt](docs/research-prompts.md) · [演示步骤](docs/demo.md)

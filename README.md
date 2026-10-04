@@ -1,5 +1,9 @@
 # Vision Scholar
 
+[![Offline engineering checks](https://github.com/cht21-c/vision-scholar/actions/workflows/ci.yml/badge.svg)](https://github.com/cht21-c/vision-scholar/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/cht21-c/vision-scholar)](https://github.com/cht21-c/vision-scholar/releases/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-173d75.svg)](LICENSE)
+
 An evidence-grounded computer vision research workspace with an **independent agent execution loop**, bounded context views, ordered tool scheduling, and reproducible CPU studies.
 
 [中文说明](README.zh-CN.md) · [Engineering contributions](CONTRIBUTIONS.md) · [Measured results](docs/research-evaluation.md) · [Full prompts](docs/research-prompts.md) · [Demo](docs/demo.md)
