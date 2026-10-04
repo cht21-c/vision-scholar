@@ -1,0 +1,36 @@
+{
+  "basis": "主执行AI对边界样本的定向证据回查；不是人评、不是盲审、不能换算总体准确率。保留原30条同模型匿名复核结果，不覆盖其评分。",
+  "selection": "重点回查旧门禁失败、digits数值格式与拒答语序误判；不是随机独立抽样。",
+  "findings": [
+    {
+      "trial_id": "normal-unknown-legacy-r1",
+      "severity": "minor",
+      "answer_quote": "CLIP论文中最高的ImageNet相关准确率为85.4%",
+      "evidence_id": "clip:p14:c3",
+      "evidence_quote": "Although adapting CLIP to the ImageNet distribution increases its ImageNet accuracy by 9.2% to 85.4% overall, and ties the accuracy of the 2018 SOTA from Mahajan et al. (2018), average accuracy under distribution shift slightly decreases.",
+      "assessment": "片段支持特定线性分类适配实验的85.4%，未证明它是整篇论文所有ImageNet相关结果的最高值。建议改为：本轮检索片段记录了线性分类适配后的85.4%。这不改变无法确认2026最高纪录的主结论，但说明引用合法和AI复核满分均不能保证表述范围准确。",
+      "blind_review_verdict": "pass",
+      "trace": "trials/normal-unknown-legacy-r1.json"
+    },
+    {
+      "trial_id": "normal-unknown-legacy-r1",
+      "severity": "minor",
+      "answer_quote": "ResNet论文仅记录了ILSVRC 2015相关的ImageNet检测结果",
+      "evidence_id": "resnet:p11:c4",
+      "evidence_quote": "Table 12. Our results (mAP, %) on the ImageNet detection dataset. Our detection system is Faster R-CNN [32] with the improvements in Table 9, using ResNet-101.",
+      "assessment": "工具返回的是第11页检测结果片段，不能由此把整篇论文限定为仅记录检测结果；应限定为本轮检索到的这一处片段。属于无必要的全称表述，主拒答结论仍成立。",
+      "blind_review_verdict": "pass",
+      "trace": "trials/normal-unknown-legacy-r1.json"
+    },
+    {
+      "trial_id": "normal-code-legacy-r1",
+      "severity": "none",
+      "answer_quote": "[code:examples/vision_ops.py:L12-L13]；[code:examples/vision_ops.py:L14]；[code:examples/vision_ops.py:L15]",
+      "evidence_id": "code:examples/vision_ops.py:L7-L15",
+      "evidence_quote": "12:     return (image.reshape(height // patch_size, patch_size, width // patch_size,\n13:                           patch_size, channels)\n14:             .transpose(0, 2, 1, 3, 4)\n15:             .reshape(-1, patch_size * patch_size * channels))",
+      "assessment": "L12-L13对应第一次reshape，L14对应轴交换，L15对应展平。旧门禁因子范围不等于父范围而拒绝，新门禁只在父范围逐行齐全时接纳。完整回放详见citation-gate-ablation.json。此例语言解释和行号均能在当前读取中核对。",
+      "blind_review_verdict": "pass",
+      "trace": "trials/normal-code-legacy-r1.json"
+    }
+  ]
+}

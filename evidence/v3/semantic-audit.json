@@ -1,0 +1,59 @@
+{
+  "scope": "Qualitative AI-assisted review of all 32 heldout task answers and selected underlying sources; not human gold, not an independent factual-accuracy benchmark.",
+  "reviewer": "Development assistant (GPT-6), distinct from the evaluated doubao-seed-2-0-lite-260428 model; development involvement remains a source of bias.",
+  "grading_unchanged": true,
+  "demo_audit": {
+    "outside_heldout_set": true,
+    "source": "evidence/demo/desktop-answer.md",
+    "findings": [
+      "Desktop UI model answer says every noise interval lower bound is >0; saved lower bounds are exactly 0.",
+      "Desktop UI model answer says every occlusion interval upper bound is <=0; seed 43 has a positive upper bound.",
+      "The 2 UI tests verify actions, numeric tables, downloads and export, not correctness of generated statistical prose."
+    ],
+    "native_first_run": "evidence/demo/native-browser-run.json contains the initial UI read_study run; its six means and stated statistical boundaries match the recorded result.",
+    "policy": "Preserve every demo answer; no repeated-model sampling to select a favorable screenshot."
+  },
+  "findings": [
+    {
+      "trials": ["tasks-heldout-hold-study-run-research-r1", "tasks-heldout-hold-study-run-research-r2", "tasks-heldout-hold-study-run-upgraded-r1", "tasks-heldout-hold-study-run-upgraded-r2"],
+      "type": "engineering_contract_failure",
+      "evidence": "All six method/condition means match saved predictions. Full plan hash is omitted from final answer. Some answers invent study-1:field citation syntax, which the paper/code citation validator does not recognize.",
+      "limitation": "The frozen grader requires the full plan ID although this particular heldout prompt did not explicitly request it. Preserve the strict 14/16 score per arm and disclose the mismatch; do not silently rescore it as 16/16.",
+      "recommended_followup": "Add a structured result card binding plan ID and metric fields outside model prose; verify research references with their own typed grammar."
+    },
+    {
+      "trials": ["tasks-heldout-hold-study-run-upgraded-r1"],
+      "type": "factual_error",
+      "evidence": "Answer says all occlusion interval upper bounds are <= 0. Saved paired_comparisons for seed 43 gives upper bound 0.0055555556 (> 0).",
+      "recommended_followup": "Read deterministic result table instead of inferring statistical direction from prose."
+    },
+    {
+      "trials": ["tasks-heldout-hold-paper-vit-research-r1", "tasks-heldout-hold-paper-vit-research-r2", "tasks-heldout-hold-paper-vit-upgraded-r1", "tasks-heldout-hold-paper-vit-upgraded-r2"],
+      "type": "corrupted_token_and_nonverbatim_quote",
+      "evidence": "All four answers contain a BOS_never_used marker. Stored vit:p3:c2 says BERT's [class] token. The anomalous string is absent from that source. Source exists and was read, yet the answer is not a faithful quotation.",
+      "recommended_followup": "Treat quotation verification separately from source existence; investigate provider token escaping without rewriting preserved trials."
+    },
+    {
+      "trials": ["tasks-heldout-hold-unknown-research-r2"],
+      "type": "unsupported_architecture_label",
+      "evidence": "The refusal to infer an undisclosed model size is appropriate, but the answer calls DETR's 28.7M ablation a pure Transformer. detr:p11:c3 describes removing FFN, leaving 10.8M parameters in the Transformer; it does not remove the CNN backbone."
+    },
+    {
+      "trials": ["tasks-heldout-hold-code-attention-research-r2"],
+      "type": "overbroad_numeric_stability_claim",
+      "evidence": "The cited subtraction of the row maximum is correct for finite scores. 'Completely prevents overflow' needs qualification: matrix multiplication can already produce nonfinite scores before the subtraction."
+    },
+    {
+      "trials": ["tasks-heldout-hold-paper-compare-research-r1", "tasks-heldout-hold-paper-compare-research-r2", "tasks-heldout-hold-paper-compare-upgraded-r1", "tasks-heldout-hold-paper-compare-upgraded-r2"],
+      "type": "attribution_caveat",
+      "evidence": "Answers correctly distinguish CNN and ViT spatial biases, but partly present 'residual learning as an optimization inductive bias' under original-paper claims. This terminology is an interpretation; original residual-mapping definitions should be separated from that interpretation."
+    }
+  ],
+  "other_checks": {
+    "invalid_symbol_recovery": "All four answers distinguish the absent imaginary_encoder from the actual residual_block source.",
+    "notes": "All four answers match the requested title and body; successful save/list tools appear in traces.",
+    "plan_only": "All four return the plan hash and correct split/selection policy; forbidden run tools are absent.",
+    "study_numeric_means": "All four study-run tables map all six means to the correct method/condition; the mean deltas agree after rounding.",
+    "not_claimed": "No 100% factual correctness or human evaluation accuracy is inferred from these checks."
+  }
+}

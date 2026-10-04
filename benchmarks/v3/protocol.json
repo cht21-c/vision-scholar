@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "created_before_v3_implementation": true,
+  "sampling": {"temperature": 0, "thinking": "disabled", "concurrency": 4, "repeats": 2},
+  "study": {
+    "dataset": "sklearn_digits",
+    "seeds": [17, 43, 89],
+    "methods": ["pixels_svm", "pca_svm"],
+    "pca_components": 24,
+    "c_candidates": [0.1, 1.0, 10.0],
+    "test_fraction": 0.2,
+    "validation_fraction_of_remaining": 0.25,
+    "noise_sigma": 3.0,
+    "occlusion_size": 2,
+    "bootstrap_samples": 2000,
+    "assertions": ["disjoint_train_validation_test", "train_only_transform_fit", "validation_only_C_selection", "paired_test_and_corruption", "recompute_accuracy_from_predictions", "same_plan_reuses_result", "modified_plan_rejected"]
+  },
+  "context": {
+    "dev_seeds": [11, 13],
+    "heldout_seeds": [101, 103, 107, 109, 113, 127, 131, 137],
+    "scenarios": ["correction_with_bloat", "artifact_lookup"],
+    "budget_chars": 18000,
+    "bloat_chars": 64000,
+    "correction_positions": [2, 5, 8],
+    "assertions": ["final_marker_matches_latest_user", "tool_data_not_user_decision", "call_result_pairs_valid", "request_within_declared_char_budget", "no_hidden_summary_calls"],
+    "arms": ["upgraded", "research_full", "research"]
+  },
+  "tasks": [
+    {"id": "dev-code", "split": "dev", "mode": "code", "prompt": "查看 patchify 源码，指出如何验证图像尺寸与 patch_size 兼容。引用代码行。", "required_tools": ["inspect_code"]},
+    {"id": "dev-paper", "split": "dev", "mode": "paper", "prompt": "ResNet 的 identity shortcut 有什么作用？检索论文并给出页码引用。", "required_tools": ["search_papers"]},
+    {"id": "dev-study", "split": "dev", "mode": "experiment", "prompt": "请为 digits 创建并运行默认多种子鲁棒性研究方案，比较像素 SVM 和 PCA SVM。读取结果，报告 clean、noise、occlusion 三种条件的均值、计划ID和局限。", "required_tools": ["plan_study", "run_study", "read_study"]},
+    {"id": "dev-notes", "split": "dev", "mode": "paper", "prompt": "保存研究笔记：标题是 dev-resolution，内容是只使用 CPU。随后读取笔记，确认保存。", "required_tools": ["save_note", "list_notes"]},
+    {"id": "hold-code-attention", "split": "heldout", "mode": "code", "prompt": "读取 scaled_dot_product_attention 源码，解释缩放因子和 softmax 的数值稳定处理。给出两处代码引用。", "required_tools": ["inspect_code"]},
+    {"id": "hold-code-invalid", "split": "heldout", "mode": "code", "prompt": "先检查 vision_ops.py 的 imaginary_encoder 函数。若没有，读取 residual_block，明确区分哪个不存在，并引用实际读到的源码。", "required_tools": ["inspect_code"], "expect_error_then_success": true},
+    {"id": "hold-paper-vit", "split": "heldout", "mode": "paper", "prompt": "ViT 如何把图像转换为 Transformer 输入序列？基于论文中的图像 patch、位置编码和分类 token 回答，附原文页码引用。", "required_tools": ["search_papers"]},
+    {"id": "hold-paper-compare", "split": "heldout", "mode": "paper", "prompt": "分别检索 ResNet 和 ViT，比较它们引入的归纳偏置；每篇至少一条论文引用，区分原文论述与推测。", "required_tools": ["search_papers"], "min_papers": 2},
+    {"id": "hold-unknown", "split": "heldout", "mode": "paper", "prompt": "仅凭当前论文库，能确认某个未公开商业模型的参数量吗？实际检索，不要用 ViT 或 ResNet 的参数量替代，明确证据是否足够。", "required_tools": ["search_papers"], "no_unsupported_claim": true},
+    {"id": "hold-study-plan", "split": "heldout", "mode": "experiment", "prompt": "创建一个 digits 鲁棒性方案：种子 17、43、89，PCA 24 维，候选 C 为 0.1、1、10，噪声标准差 3，遮挡边长 2。只创建方案，不要运行。返回计划ID、拆分方式和为何不能用测试集选 C。", "required_tools": ["plan_study"], "forbidden_tools": ["run_study", "run_experiment"]},
+    {"id": "hold-study-run", "split": "heldout", "mode": "experiment", "prompt": "创建并运行默认 digits 多种子鲁棒性研究，然后读取已完成结果。列出两个方法在三种条件的平均准确率及差值，说明区间的统计边界、验证集选参以及这不是大型论文复现。不要编造任何数字。", "required_tools": ["plan_study", "run_study", "read_study"]},
+    {"id": "hold-notes", "split": "heldout", "mode": "paper", "prompt": "保存一条笔记，标题 hold-pca，正文：研究约束是使用 24 维 PCA；噪声实验的结论不能推广到所有数据集。保存完成后读取笔记，确认标题和正文。", "required_tools": ["save_note", "list_notes"]}
+  ],
+  "scheduler": {
+    "modes": ["serial", "parallel", "barrier"],
+    "max_concurrency": 3,
+    "repeats": 5,
+    "read_delay_seconds": 0.04,
+    "write_delay_seconds": 0.06,
+    "cases": ["independent_reads", "write_then_read", "read_write_read", "one_read_fails", "invalid_schema", "unknown_tool", "cancel_batch", "bound_concurrency"],
+    "timings_are_artificial": true
+  },
+  "grading": {
+    "primary": "deterministic engineering assertions and exact markers, not human gold",
+    "semantic_review": "separate AI-assisted audit, disclose same-model bias",
+    "heldout_policy": "Any behavior change after inspecting heldout failures reclassifies that batch as development; freeze a new heldout batch before rerunning.",
+    "failures": "Retain all attempts including timeouts, incomplete usage, and failed assertions."
+  }
+}
